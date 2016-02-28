@@ -26,7 +26,7 @@ RUN wget -nv https://github.com/fredokun/cl-jupyter/archive/master.zip && unzip 
 
 # hdf5
 
-RUN wget http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.16.tar.gz && tar -zxvf hdf5-1.8.16.tar.gz && cd hdf5-1.8.16 && ./configure --prefix=/root --enable-production && make -j2 && make install
+RUN wget http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.16.tar.gz && tar -zxvf hdf5-1.8.16.tar.gz && cd hdf5-1.8.16 && ./configure --prefix=/usr/local --enable-production && make -j2 && make install
 
 # hdf5-cffi
 
@@ -34,6 +34,6 @@ RUN wget https://github.com/HDFGroup/hdf5-cffi/archive/master.zip && unzip maste
 
 RUN mv /root/quicklisp/local-projects/hdf5-cffi-master /root/quicklisp/local-projects/hdf5-cffi 
 
-RUN cd /root/quicklisp/local-projects/hdf5-cffi && CC=/root/bin/h5cc LD_LIBRARY_PATH=/root/lib make && LD_LIBRARY_PATH=/root/lib sbcl --eval "(ql:quickload :hdf5-cffi)"
+RUN cd /root/quicklisp/local-projects/hdf5-cffi && CC=/usr/local/bin/h5cc LD_LIBRARY_PATH=/usr/local/lib make && LD_LIBRARY_PATH=/usr/local/lib sbcl --eval "(ql:quickload :hdf5-cffi)"
 
 # alcove
