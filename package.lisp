@@ -6,9 +6,9 @@
 
    ;; alcove.lisp
 
-   :+hdf5-signature+
-   :read-bytes
-   :read-uinteger
+   +hdf5-signature+
+   read-bytes
+   read-uinteger
 
    ;; file.lisp
 
