@@ -7,9 +7,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install wget unzip
 
 # SBCL
 
-RUN wget -nv http://downloads.sourceforge.net/project/sbcl/sbcl/1.3.2/sbcl-1.3.2-x86-64-linux-binary.tar.bz2 \
- && tar -jxvf sbcl-1.3.2-x86-64-linux-binary.tar.bz2 \
- && cd sbcl-1.3.2-x86-64-linux && sh install.sh
+RUN wget -nv http://downloads.sourceforge.net/project/sbcl/sbcl/1.3.3/sbcl-1.3.3-x86-64-linux-binary.tar.bz2 \
+ && tar -jxvf sbcl-1.3.3-x86-64-linux-binary.tar.bz2 \
+ && cd sbcl-1.3.3-x86-64-linux && sh install.sh
 
 # Quicklisp
 
@@ -35,8 +35,9 @@ RUN wget -nv https://github.com/fredokun/cl-jupyter/archive/master.zip \
 
 RUN wget http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.16.tar.gz \
  && tar -zxvf hdf5-1.8.16.tar.gz \
- && cd hdf5-1.8.16 && ./configure --prefix=/usr/local --enable-production \
- && make -j2 \
+ && cd hdf5-1.8.16 \
+ && ./configure --prefix=/usr/local --enable-production --enable-threadsafe --disable-hl \
+ && make -j3 \
  && make install
 
 ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
