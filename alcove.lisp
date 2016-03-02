@@ -1,6 +1,6 @@
 ;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
 
-(in-package :alcove)
+(in-package #:alcove)
 
 
 (defmacro define-constant (name value &optional doc)
