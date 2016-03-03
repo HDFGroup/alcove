@@ -36,7 +36,7 @@ Don't search beyond MAX-OFFSET (Default: EOF).
 READ-SUPERBLOCK
 Args: (INPUT-STREAM)
 Locate the HDF5 file format signature in INPUT-STREAM and read the superblock.
-Return the superblock as an association list or NIL of the file format
+Return the superblock as an association list or NIL if the file format
 signature is not found.
 ------------------------------------------------------------------------------"
   (assert (file-position input-stream 0))
