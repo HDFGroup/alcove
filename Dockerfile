@@ -54,7 +54,8 @@ ENV CC=/usr/local/bin/h5cc
 
 RUN cd /root/quicklisp/local-projects/hdf5-cffi \
  && make \
- && sbcl --eval "(ql:quickload :hdf5-cffi)"
+ && sbcl --eval "(ql:quickload :hdf5-cffi)" \
+ && sbcl --eval "(require 'asdf)" --eval "(require 'hdf5-cffi)"
 
 # alcove
 

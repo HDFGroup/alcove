@@ -15,6 +15,10 @@
    #:get-file-name
    #:get-superblock
 
+   ;; ohdr.lisp
+
+   #:read-odhr
+
    ;; superblock.lisp
 
    #:find-format-signature
