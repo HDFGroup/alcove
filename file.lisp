@@ -3,6 +3,10 @@
 (in-package #:alcove)
 
 
+(defun add-superblock (input-stream file)
+  (nconc file `((superblock . ,(read-superblock input-stream)))))
+
+
 (defun get-base-adress (file)
   (cdr (assoc 'base-address (get-superblock file))))
 
@@ -34,3 +38,7 @@
 
 (defun get-superblock (file)
   (cdr (assoc 'superblock file)))
+
+
+(defun make-file (file-name)
+  `((file-name . ,file-name)))

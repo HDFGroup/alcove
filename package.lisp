@@ -12,12 +12,15 @@
 
    ;; file.lisp
 
+   #:add-superblock
    #:get-file-name
+   #:get-root-ohdr-address
    #:get-superblock
+   #:make-file
 
    ;; ohdr.lisp
 
-   #:read-odhr
+   #:read-ohdr
 
    ;; superblock.lisp
 
