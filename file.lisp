@@ -3,6 +3,12 @@
 (in-package #:alcove)
 
 
+(defun add-root-ohdr (input-stream file)
+  (nconc file `((root-ohdr . ,(read-ohdr input-stream
+                                         (get-root-ohdr-address file)
+                                         file)))))
+
+
 (defun add-superblock (input-stream file)
   (nconc file `((superblock . ,(read-superblock input-stream)))))
 

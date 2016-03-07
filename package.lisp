@@ -12,6 +12,7 @@
 
    ;; file.lisp
 
+   #:add-root-ohdr
    #:add-superblock
    #:get-file-name
    #:get-root-ohdr-address
