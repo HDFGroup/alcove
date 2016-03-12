@@ -1,4 +1,4 @@
-;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
+;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10 -*
 
 (in-package #:alcove)
 
@@ -47,52 +47,69 @@
          (data . ,(read-bytes input-stream msg-size))))
 
       ((= msg-type 2)
-       (let* ((version (read-byte input-stream))
-              (flags (read-byte input-stream))
-              (result `((name . "Link Info")
-                        (version . ,version)
-                        (flags . ,flags))))
-         (when (ldb-test (byte 1 0) flags)
-           (nconc result
-                  `((max-creation-index . ,(read-uinteger input-stream 8)))))
-         (nconc result
-                `((fractal-heap-address . ,(read-uinteger input-stream
-                                                          size-of-offsets))
-                  (name-index-v2-b-tree-address . ,(read-uinteger
-                                                    input-stream
-                                                    size-of-offsets))))
-         (when (ldb-test (byte 1 1) flags)
-           (nconc result
-                  `((creation-order-index-v2-b-tree-address
-                     .
-                     ,(read-uinteger input-stream size-of-offsets)))))
-         result))
+       (read-link-info-msg input-stream size-of-offsets))
 
       ((= msg-type 10)
-       (let* ((version (read-byte input-stream))
-              (flags (read-byte input-stream))
-              (result `((name . "Group Info")
-                        (version . ,version)
-                        (flags . ,flags))))
-         (when (ldb-test (byte 1 0) flags)
-           (nconc result
-                  `((max-compact-value . ,(read-uinteger input-stream 2))
-                    (min-dense-value . ,(read-uinteger input-stream 2)))))
-         (when (ldb-test (byte 1 1) flags)
-           (nconc result
-                  `((est-num-entries . ,(read-uinteger input-stream 2))
-                    (est-link-name-length . ,(read-uinteger input-stream 2)))))
-         result))
+       (read-group-info-msg input-stream))
 
       ((= msg-type 17)
-       `((name . "Symbol Table")
-         (v1-b-tree-address . ,(read-uinteger input-stream size-of-offsets))
-         (local-heap-address . ,(read-uinteger input-stream size-of-offsets))))
+       (read-symbol-table-msg input-stream size-of-offsets))
 
       ((= msg-type 18)
-       `((name . "Object Modification Time")
-         (version . ,(read-byte input-stream))
-         (reserved . ,(read-bytes input-stream 3))
-         (seconds-after-unix-epoch . ,(read-uinteger input-stream 4))))
+       (read-object-modification-time-msg input-stream))
 
       (t (read-bytes input-stream msg-size)))))
+
+
+(defun read-group-info-msg (input-stream)
+  "https://www.hdfgroup.org/HDF5/doc/H5.format.html#GroupInfoMessage"
+  (let* ((version (read-byte input-stream))
+         (flags (read-byte input-stream))
+         (result `((name . "Group Info")
+                   (version . ,version)
+                   (flags . ,flags))))
+    (when (ldb-test (byte 1 0) flags)
+      (nconc result
+             `((max-compact-value . ,(read-uinteger input-stream 2))
+               (min-dense-value . ,(read-uinteger input-stream 2)))))
+    (when (ldb-test (byte 1 1) flags)
+      (nconc result
+             `((est-num-entries . ,(read-uinteger input-stream 2))
+               (est-link-name-length . ,(read-uinteger input-stream 2)))))
+    result))
+
+
+(defun read-link-info-msg (input-stream size-of-offsets)
+  "https://www.hdfgroup.org/HDF5/doc/H5.format.html#LinkInfoMessage"
+  (let* ((version (read-byte input-stream))
+         (flags (read-byte input-stream))
+         (result `((name . "Link Info") (version . ,version) (flags . ,flags))))
+    (when (ldb-test (byte 1 0) flags)
+      (nconc result `((max-creation-index . ,(read-uinteger input-stream 8)))))
+    (nconc result
+           `((fractal-heap-address . ,(read-uinteger input-stream
+                                                     size-of-offsets))
+             (name-index-v2-b-tree-address . ,(read-uinteger
+                                               input-stream
+                                               size-of-offsets))))
+    (when (ldb-test (byte 1 1) flags)
+      (nconc result
+             `((creation-order-index-v2-b-tree-address
+                .
+                ,(read-uinteger input-stream size-of-offsets)))))
+    result))
+
+
+(defun read-object-modification-time-msg (input-stream)
+  "https://www.hdfgroup.org/HDF5/doc/H5.format.html#ModificationTimeMessage"
+  `((name . "Object Modification Time")
+    (version . ,(read-byte input-stream))
+    (reserved . ,(read-bytes input-stream 3))
+    (seconds-after-unix-epoch . ,(read-uinteger input-stream 4))))
+
+
+(defun read-symbol-table-msg (input-stream size-of-offsets)
+  "https://www.hdfgroup.org/HDF5/doc/H5.format.html#SymbolTableMessage"
+  `((name . "Symbol Table")
+    (v1-b-tree-address . ,(read-uinteger input-stream size-of-offsets))
+    (local-heap-address . ,(read-uinteger input-stream size-of-offsets))))
