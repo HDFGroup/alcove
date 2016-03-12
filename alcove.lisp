@@ -1,4 +1,4 @@
-;;;; -*- Mode: Lisp; indent-tabs-mode: nil -*-
+;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10 -*
 
 (in-package #:alcove)
 
@@ -35,9 +35,9 @@ READ-BYTES
 Args: (INPUT-STREAM COUNT)
 Read COUNT bytes from INPUT-STREAM. Return a byte array.
 ------------------------------------------------------------------------------"
-  (let ((buffer (make-array count :element-type 'unsigned-byte)))
-    (read-sequence buffer input-stream)
-    buffer))
+  (let ((result (make-array count :element-type 'unsigned-byte)))
+    (assert (= count (read-sequence result input-stream)))
+    result))
 
 
 (defun read-uinteger (input-stream count)
@@ -46,7 +46,7 @@ READ-UINTEGER
 Args: (INPUT-STREAM COUNT)
 Read COUNT bytes from INPUT-STREAM. Return an (unsigned) integer.
 ------------------------------------------------------------------------------"
-  (let ((result 0))
+  (let ((result 0)
+	(buffer (read-bytes input-stream count)))
     (dotimes (i count result)
-      (incf result (* (ash 1 (* 8 i))
-                      (read-byte input-stream))))))
+      (incf result (* (ash 1 (* 8 i)) (aref buffer i))))))
