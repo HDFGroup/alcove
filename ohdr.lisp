@@ -43,7 +43,8 @@ Return an association list.
              ((= version 2)
               (let* ((result (read-v2-ohdr-prefix input-stream file))
                      (size-of-chunk0 (cdr (assoc 'size-of-chunk0 result)))
-                     (messages nil))
+                     (messages nil)
+                     (checksum nil))
                 (when (< 0 size-of-chunk0)
                   (do* ((processed 0)
                         (rem size-of-chunk0 (- size-of-chunk0 processed)))
@@ -51,13 +52,13 @@ Return an association list.
                         (when (< 0 rem)
                           (nconc result
                                  `((gap . ,(read-bytes input-stream rem)))))
-                        (nconc result
-                               `((checksum . ,(read-bytes input-stream 4))))
+                        (setq checksum (read-bytes input-stream 4))
                         result)
                     (let ((msg (read-ohdr-message input-stream result file)))
                       (incf processed (+ 6 (cdr (assoc 'msg-data-size msg))))
                       (setf messages (cons msg messages)))))
-                (nconc result `((messages . ,(nreverse messages))))
+                (nconc result `((messages . ,messages)))
+                (nconc result `((checksum . ,checksum)))
                 result))
 
              ;; unknown version
@@ -84,11 +85,7 @@ Return an association list.
          (cust-attr-stor-phase-change (ldb-test (byte 1 4) flags))
          (amcb-times-stored (ldb-test (byte 1 5) flags)))
     (nconc result
-           `((flags . ,flags)
-             (track-attr-crt-order . ,track-attr-crt-order)
-             (index-attr-crt-order . ,index-attr-crt-order)
-             (cust-attr-stor-phase-change . ,cust-attr-stor-phase-change)
-             (abcm-times-stored . ,amcb-times-stored)))
+           `((flags . ,flags)))
     ;; timestamps
     (when amcb-times-stored
       (nconc result

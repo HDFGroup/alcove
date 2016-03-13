@@ -4,9 +4,7 @@
 
 
 (defun read-ohdr-message (input-stream ohdr file)
-  (let ((ohdr-version (cdr (assoc 'ohdr-version ohdr)))
-        (size-of-lengths (get-size-of-lengths file))
-        (size-of-offsets (get-size-of-offsets file)))
+  (let ((ohdr-version (cdr (assoc 'ohdr-version ohdr))))
     (cond
       ;; version 1 OHDR
       ((= ohdr-version 1)
@@ -14,6 +12,7 @@
               (msg-size (read-uinteger input-stream 2))
               (msg-flags (read-byte input-stream))
               (reserved (read-bytes input-stream 3)))
+         (declare (ignore reserved))
          `((msg-type . ,msg-type)
            (msg-data-size . ,msg-size)
            (msg-flags . ,msg-flags)
@@ -27,12 +26,14 @@
               (msg-flags (read-byte input-stream))
               (msg-crt-order (when (cdr (assoc 'track-attr-crt-order ohdr))
                                (read-uinteger input-stream 2))))
-         `((msg-type . ,msg-type)
-           (msg-data-size . ,msg-size)
-           (msg-flags . ,msg-flags)
-           (msg-crt-order . ,msg-crt-order)
-           (msg-data . ,(parse-ohdr-msg-data input-stream msg-type msg-size
-                                             msg-flags ohdr file)))))
+         (append
+          `((msg-type . ,msg-type)
+            (msg-data-size . ,msg-size)
+            (msg-flags . ,msg-flags))
+          (when msg-crt-order
+             `((msg-crt-order . ,msg-crt-order)))
+          `((msg-data . ,(parse-ohdr-msg-data input-stream msg-type msg-size
+                                              msg-flags ohdr file))))))
       ;; default
       (t nil))))
 
